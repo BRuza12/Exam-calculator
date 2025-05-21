@@ -1,20 +1,26 @@
 import streamlit as st
 import streamlit.components.v1 as components
 
-# Google Analytics
-components.html("""
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-DFMK70428K"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-DFMK70428K');
-</script>
-""", height=0)
-
 # Настройки страницы
 st.set_page_config(page_title="Калькулятор экзамена", page_icon="📊")
+
+# Встраиваем Google Analytics через HTML компонент с sandbox
+components.html(
+    """
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-DFMK70428K"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-DFMK70428K');
+    </script>
+    """,
+    height=0,
+    scrolling=False,
+    # sandbox режим отключён, чтобы скрипты работали
+    # можно добавить, если будет ошибка: sandbox="allow-scripts allow-same-origin"
+)
 
 # Заголовок
 st.title("Сколько нужно набрать на финальном экзамене?")
