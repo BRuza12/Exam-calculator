@@ -39,3 +39,17 @@ if st.button("Рассчитать"):
         st.success("Поздравляем! Вы уже прошли. Финальный экзамен можно не сдавать.")
     else:
         st.info(f"Чтобы пройти, нужно набрать на финальном экзамене минимум **{required_final:.2f}** баллов.")
+
+# Аналитика — только по паролю
+if st.checkbox("Показать аналитику"):
+    password = st.text_input("Введите пароль для доступа к аналитике", type="password")
+    if password == "qweasd123":  # <-- ЗАМЕНИ ЭТО НА СВОЙ ПАРОЛЬ
+        if os.path.exists("analytics_log.txt"):
+            with open("analytics_log.txt", "r") as f:
+                logs = f.readlines()
+            st.text(f"Всего расчетов: {len(logs)}")
+            st.text_area("Логи", "".join(logs), height=200)
+        else:
+            st.info("Еще нет данных аналитики.")
+    elif password:
+        st.warning("Неверный пароль")
