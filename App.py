@@ -1,25 +1,15 @@
 import streamlit as st
-import streamlit.components.v1 as components
+import os
+import datetime
 
 # Настройки страницы
 st.set_page_config(page_title="Калькулятор экзамена", page_icon="📊")
 
-# Встраиваем Google Analytics через HTML компонент с sandbox
-components.html(
-    """
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-DFMK70428K"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-DFMK70428K');
-    </script>
-    """,
-    height=0,
-    scrolling=False,
-    sandbox="allow-scripts allow-same-origin"
-)
+# Простая аналитика — логгируем в файл
+def log_event():
+    now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    with open("analytics_log.txt", "a") as f:
+        f.write(f"{now} - Рассчитано\n")
 
 # Заголовок
 st.title("Сколько нужно набрать на финальном экзамене?")
@@ -36,6 +26,8 @@ e4 = st.number_input("Экзамен 4", min_value=0.0, max_value=100.0, value=0
 
 # Расчёт
 if st.button("Рассчитать"):
+    log_event()  # логируем нажатие
+
     avg = (e1 + e2 + e3 + e4) / 4
     required_final = (70 - 0.4 * avg) / 0.6
 
