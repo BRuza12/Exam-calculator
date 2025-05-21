@@ -18,8 +18,7 @@ components.html(
     """,
     height=0,
     scrolling=False,
-    # sandbox режим отключён, чтобы скрипты работали
-    # можно добавить, если будет ошибка: sandbox="allow-scripts allow-same-origin"
+    sandbox="allow-scripts allow-same-origin"
 )
 
 # Заголовок
