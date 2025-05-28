@@ -1,77 +1,122 @@
 import streamlit as st
-import os
 import datetime
 import pytz
+import os
 
-# Настройки страницы
-st.set_page_config(page_title="📊 Калькулятор экзамена", page_icon="📘", layout="wide")
+# --- Настройки страницы ---
+st.set_page_config(page_title="Exam Calculator", page_icon="📘", layout="wide")
 
-# Тёмная тема
-st.markdown("""
-    <style>
-        body {
-            background-color: #1e1e2f;
-            color: #f5f5f5;
-        }
-        .stApp {
-            background-color: #1e1e2f;
-        }
-    </style>
-""", unsafe_allow_html=True)
+# --- Переводы ---
+translations = {
+    "ru": {
+        "title": "📘 Калькулятор финального экзамена",
+        "desc": "Введите баллы за 4 промежуточных экзамена, чтобы узнать, какой балл нужен на финальном, чтобы пройти.",
+        "exam": "Экзамен",
+        "button": "📐 Рассчитать результат",
+        "avg": "Средний балл",
+        "error": "❌ Даже 100 баллов не хватит. Нужно:",
+        "success": "✅ Поздравляем! Вы уже прошли.",
+        "info": "ℹ️ Нужно набрать минимум",
+        "analytics": "Показать аналитику",
+        "password": "Введите пароль для доступа к аналитике",
+        "wrong_password": "Неверный пароль",
+        "empty_log": "Лог пустой.",
+        "total": "Всего расчётов"
+    },
+    "en": {
+        "title": "📘 Final Exam Calculator",
+        "desc": "Enter scores from 4 midterms to find out what you need on the final to pass.",
+        "exam": "Exam",
+        "button": "📐 Calculate Result",
+        "avg": "Average Score",
+        "error": "❌ Even 100 points won't be enough. Required:",
+        "success": "✅ Congrats! You've already passed.",
+        "info": "ℹ️ You need at least",
+        "analytics": "Show Analytics",
+        "password": "Enter password to access analytics",
+        "wrong_password": "Wrong password",
+        "empty_log": "Log is empty.",
+        "total": "Total calculations"
+    },
+    "kg": {
+        "title": "📘 Финалдык экзамен калькулятору",
+        "desc": "Акыркы экзаменден өтүү үчүн эмне алуу керек экенин билүү үчүн 4 аралык баллды киргизиңиз.",
+        "exam": "Экзамен",
+        "button": "📐 Натыйжаны эсепте",
+        "avg": "Орточо балл",
+        "error": "❌ Атүгүл 100 балл жетпейт. Керек:",
+        "success": "✅ Куттуктайм! Сиз өттүңүз.",
+        "info": "ℹ️ Акыркы экзаменде алуу керек:",
+        "analytics": "Аналитиканы көрсөтүү",
+        "password": "Аналитикага кирүү үчүн сырсөздү киргизиңиз",
+        "wrong_password": "Сырсөз туура эмес",
+        "empty_log": "Лог бош.",
+        "total": "Бардык эсептөөлөр"
+    },
+    "tr": {
+        "title": "📘 Final Sınav Hesaplayıcı",
+        "desc": "Finalden geçmek için kaç puan almanız gerektiğini öğrenmek için 4 ara sınav notunuzu girin.",
+        "exam": "Sınav",
+        "button": "📐 Sonucu Hesapla",
+        "avg": "Ortalama Puan",
+        "error": "❌ 100 puan bile yetmez. Gerekli:",
+        "success": "✅ Tebrikler! Zaten geçtiniz.",
+        "info": "ℹ️ Finalde en az",
+        "analytics": "Analitiği Göster",
+        "password": "Analitiğe erişmek için şifre girin",
+        "wrong_password": "Yanlış şifre",
+        "empty_log": "Kayıt boş.",
+        "total": "Toplam hesaplama"
+    }
+}
 
-# Функция логирования событий с часовой зоной Бишкек
-def log_event():
-    tz = pytz.timezone("Asia/Bishkek")
-    now = datetime.datetime.now(tz).strftime("%Y-%m-%d %H:%M:%S")
-    with open("analytics_log.txt", "a") as f:
-        f.write(f"{now} - Рассчитано\n")
+# --- Язык ---
+lang = st.selectbox("🌐 Язык / Language / Тил / Dil", ["ru", "en", "kg", "tr"], format_func=lambda x: {
+    "ru": "Русский 🇷🇺", "en": "English 🇬🇧", "kg": "Кыргызча 🇰🇬", "tr": "Türkçe 🇹🇷"
+}[x])
+t = translations[lang]
 
-# Заголовок
-st.title("📘 Калькулятор финального экзамена")
-st.markdown("Введите баллы за 4 промежуточных экзамена, чтобы узнать, какой балл нужен на финальном, чтобы пройти.")
+# --- Интерфейс ---
+st.title(t["title"])
+st.markdown(t["desc"])
 st.divider()
 
-# Ввод баллов
-st.subheader("✏️ Введите баллы")
 col1, col2, col3, col4 = st.columns(4)
-with col1:
-    e1 = st.number_input("Экзамен 1", min_value=0.0, max_value=100.0, value=0.0)
-with col2:
-    e2 = st.number_input("Экзамен 2", min_value=0.0, max_value=100.0, value=0.0)
-with col3:
-    e3 = st.number_input("Экзамен 3", min_value=0.0, max_value=100.0, value=0.0)
-with col4:
-    e4 = st.number_input("Экзамен 4", min_value=0.0, max_value=100.0, value=0.0)
+with col1: e1 = st.number_input(f"{t['exam']} 1", 0.0, 100.0, 0.0)
+with col2: e2 = st.number_input(f"{t['exam']} 2", 0.0, 100.0, 0.0)
+with col3: e3 = st.number_input(f"{t['exam']} 3", 0.0, 100.0, 0.0)
+with col4: e4 = st.number_input(f"{t['exam']} 4", 0.0, 100.0, 0.0)
 
-st.divider()
-
-# Кнопка расчёта
-if st.button("📐 Рассчитать результат"):
-    log_event()
+if st.button(t["button"]):
     avg = (e1 + e2 + e3 + e4) / 4
     required_final = (70 - 0.4 * avg) / 0.6
-
-    st.metric(label="Средний балл", value=f"{avg:.2f}")
-    st.progress(min(avg, 100) / 100)
+    st.metric(t["avg"], f"{avg:.2f}")
 
     if required_final > 100:
-        st.error(f"❌ Даже 100 баллов не хватит. Нужно: **{required_final:.2f}**")
+        st.error(f"{t['error']} **{required_final:.2f}**")
     elif required_final <= 0:
-        st.success("✅ Поздравляем! Вы уже прошли.")
+        st.success(t["success"])
         st.balloons()
     else:
-        st.info(f"ℹ️ Нужно набрать минимум **{required_final:.2f}** баллов на финальном экзамене.")
+        st.info(f"{t['info']} **{required_final:.2f}**")
 
-# Просмотр аналитики по паролю
-if st.checkbox("Показать аналитику"):
-    password = st.text_input("Введите пароль для доступа к аналитике", type="password")
-    if password == "qweasd123":  # Замени на свой пароль
-        if os.path.exists("analytics_log.txt"):
-            with open("analytics_log.txt", "r") as f:
-                logs = f.readlines()
-            st.text(f"Всего расчётов: {len(logs)}")
-            st.text_area("Логи аналитики", "".join(logs), height=200)
+    # --- Логирование в файл ---
+    tz = pytz.timezone("Asia/Bishkek")
+    now = datetime.datetime.now(tz).strftime("%Y-%m-%d %H:%M:%S")
+    with open("log.txt", "a", encoding="utf-8") as f:
+        f.write(f"{now} — avg: {avg:.2f}, required: {required_final:.2f}\n")
+
+# --- Просмотр аналитики (по паролю) ---
+st.divider()
+with st.expander(t["analytics"]):
+    pw = st.text_input(t["password"], type="password")
+    if pw == "analiz123":  # 🔐 Измени по желанию
+        if os.path.exists("log.txt"):
+            with open("log.txt", "r", encoding="utf-8") as f:
+                lines = f.readlines()
+                st.metric(t["total"], len(lines))
+                st.code("".join(lines[-10:]), language="text")
         else:
-            st.info("Лог пустой.")
-    elif password:
-        st.warning("Неверный пароль")
+            st.warning(t["empty_log"])
+    elif pw:
+        st.error(t["wrong_password"])
